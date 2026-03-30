@@ -21,9 +21,12 @@ class Station(Base):
     lat: Mapped[float] = mapped_column(Float)
     lng: Mapped[float] = mapped_column(Float)
     price_history: Mapped[List["PriceHistory"]] = relationship(back_populates="station")
+
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+    def __repr__(self):
+        return f"Station(id={self.id!r}, name={self.name!r}, brand={self.brand!r}, street={self.street!r})"
 
 
 class PriceHistory(Base):
@@ -36,6 +39,9 @@ class PriceHistory(Base):
     timestamp: Mapped[datetime] = mapped_column(DateTime)
     station_id: Mapped[str] = mapped_column(String(36), ForeignKey("station.id"))
     station: Mapped["Station"] = relationship(back_populates="price_history")
+
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
+    def __repr__(self):
+        return f"PriceHistory(id={self.id!r}, station_id={self.station_id!r}, is_open={self.is_open!r}, e5={self.e5!r}, e10={self.e10!r}, diesel={self.diesel!r}, timestamp={self.timestamp!r})"
