@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import List
-from sqlalchemy import ForeignKey, String, Float, Integer, Boolean, Numeric, DateTime
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, String, Float, Integer, Boolean, Numeric, DateTime, create_engine
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from decimal import Decimal
+
+engine = create_engine("sqlite:///tankstellen-alert.db")
 
 
 class Base(DeclarativeBase):
@@ -45,3 +47,6 @@ class PriceHistory(Base):
 
     def __repr__(self):
         return f"PriceHistory(id={self.id!r}, station_id={self.station_id!r}, is_open={self.is_open!r}, e5={self.e5!r}, e10={self.e10!r}, diesel={self.diesel!r}, timestamp={self.timestamp!r})"
+
+
+Base.metadata.create_all(engine)
