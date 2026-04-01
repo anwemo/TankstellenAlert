@@ -18,7 +18,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from decimal import Decimal
 
-# TODO 5: feat: implement price history upsert logic
 # TODO 6: feat: implement price check logic
 # TODO 7: feat: add notification trigger logic
 # TODO 8: feat: add webhook dispatch logic
@@ -72,7 +71,8 @@ class PriceHistory(Base):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return f"PriceHistory(id={self.id!r}, station_id={self.station_id!r}, is_open={self.is_open!r}, e5={self.e5!r}, e10={self.e10!r}, diesel={self.diesel!r}, timestamp={self.timestamp!r})"
+        return (f"PriceHistory(id={self.id!r}, station_id={self.station_id!r}, is_open={self.is_open!r},"
+                f"e5={self.e5!r}, e10={self.e10!r}, diesel={self.diesel!r}, timestamp={self.timestamp!r})")
 
 
 Base.metadata.create_all(engine)
@@ -113,3 +113,22 @@ def upsert_station(station_id):
         session.commit()
 
 
+def price_history_upsert(station_ids: list):
+    if not station_ids:
+        return
+    new_prices = []
+    all_stations_prices = get_prices(station_ids).get("prices", {})
+    with Session(engine) as session:
+        for station_id, prices in all_stations_prices.items():
+            new_price = PriceHistory(
+                e5=prices.get("e5"),
+                e10=prices.get("e10"),
+                diesel=prices.get("diesel"),
+                is_open=prices.get("status") == "open",
+                timestamp=datetime.today(),
+                station_id=station_id,
+            )
+            session.add(new_price)
+            new_prices.append(new_price)
+        session.commit()
+    return new_prices
