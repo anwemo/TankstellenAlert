@@ -1,8 +1,27 @@
 from datetime import datetime
 from typing import List
-from sqlalchemy import ForeignKey, String, Float, Integer, Boolean, Numeric, DateTime, create_engine
+from sqlalchemy import (
+    ForeignKey,
+    String,
+    Float,
+    Integer,
+    Boolean,
+    Numeric,
+    DateTime,
+    create_engine,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from decimal import Decimal
+
+
+# DONE 1: feat: define database models and table schema
+# TODO 2: feat: define API request functions
+# TODO 3: feat: add setup_stations script for initial station discovery
+# TODO 4: feat: implement station upsert logic
+# TODO 5: feat: implement price history upsert logic
+# TODO 6: feat: add notification trigger logic
+# TODO 7: feat: add webhook dispatch logic
+
 
 engine = create_engine("sqlite:///tankstellen-alert.db")
 
