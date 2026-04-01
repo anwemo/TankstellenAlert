@@ -46,6 +46,7 @@ class Station(Base):
     lat: Mapped[float] = mapped_column(Float)
     lng: Mapped[float] = mapped_column(Float)
     price_history: Mapped[List["PriceHistory"]] = relationship(back_populates="station")
+    last_updated: Mapped[datetime] = mapped_column(DateTime)
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
