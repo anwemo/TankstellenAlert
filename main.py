@@ -3,7 +3,7 @@ import time
 
 from dotenv import load_dotenv
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
 from sqlalchemy import (
     ForeignKey,
@@ -18,7 +18,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from decimal import Decimal
 
-# TODO 6: feat: implement price check logic
 # TODO 7: feat: add notification trigger logic
 # TODO 8: feat: add webhook dispatch logic
 
@@ -26,6 +25,8 @@ load_dotenv()
 API_KEY = os.environ.get("API_KEY")
 URL = "https://creativecommons.tankerkoenig.de/json"
 STATION_IDS = os.environ.get("STATION_IDS", "").split(",")
+GAS_TYPE = "e10"
+THRESHOLD = 2.0
 
 
 engine = create_engine("sqlite:///tankstellen-alert.db")
@@ -71,21 +72,25 @@ class PriceHistory(Base):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return (f"PriceHistory(id={self.id!r}, station_id={self.station_id!r}, is_open={self.is_open!r},"
-                f"e5={self.e5!r}, e10={self.e10!r}, diesel={self.diesel!r}, timestamp={self.timestamp!r})")
+        return (
+            f"PriceHistory(id={self.id!r}, station_id={self.station_id!r}, is_open={self.is_open!r},"
+            f"e5={self.e5!r}, e10={self.e10!r}, diesel={self.diesel!r}, timestamp={self.timestamp!r})"
+        )
 
 
 Base.metadata.create_all(engine)
 
 
 def get_station_info(station_id):
-    r = requests.get(URL+"/detail.php", params={"id": station_id, "apikey": API_KEY})
+    r = requests.get(URL + "/detail.php", params={"id": station_id, "apikey": API_KEY})
     r.raise_for_status()
     return r.json()
 
 
 def get_prices(station_ids: list):
-    r = requests.get(URL+"/prices.php", params={"ids": ",".join(station_ids), "apikey": API_KEY})
+    r = requests.get(
+        URL + "/prices.php", params={"ids": ",".join(station_ids), "apikey": API_KEY}
+    )
     r.raise_for_status()
     return r.json()
 
@@ -113,7 +118,7 @@ def upsert_station(station_id):
         session.commit()
 
 
-def price_history_upsert(station_ids: list):
+def add_price_history(station_ids: list):
     if not station_ids:
         return
     new_prices = []
@@ -132,3 +137,39 @@ def price_history_upsert(station_ids: list):
             new_prices.append(new_price)
         session.commit()
     return new_prices
+
+
+def check_and_update_station(station_id):
+    with Session(engine) as session:
+        station = session.get(Station, station_id)
+        if datetime.today() - station.last_updated > timedelta(days=7):
+            upsert_station(station_id)
+
+
+def price_check(threshold=THRESHOLD, gas_type=GAS_TYPE, station_ids=None):
+    if station_ids is None:
+        station_ids = STATION_IDS
+    if not station_ids:
+        return "Error! No station ids defined."
+    for station_id in station_ids:
+        check_and_update_station(station_id)
+    new_prices = add_price_history(station_ids)
+    if not new_prices:
+        return None
+    alert_stations = []
+    with Session(engine) as session:
+        for new_price in new_prices:
+            price = getattr(new_price, gas_type)
+            if price and price < threshold:
+                station = session.get(Station, new_price.station_id)
+                alert_stations.append(
+                    {
+                        "gas_type": gas_type,
+                        "price": price,
+                        "threshold": threshold,
+                        "name": station.name,
+                        "brand": station.brand,
+                        "street": f"{station.street} {station.house_number}",
+                    }
+                )
+    return alert_stations
