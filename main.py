@@ -1,4 +1,6 @@
 import os
+import time
+
 from dotenv import load_dotenv
 import requests
 from datetime import datetime
@@ -16,14 +18,15 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from decimal import Decimal
 
-# TODO 4: feat: implement station upsert logic
 # TODO 5: feat: implement price history upsert logic
-# TODO 6: feat: add notification trigger logic
-# TODO 7: feat: add webhook dispatch logic
+# TODO 6: feat: implement price check logic
+# TODO 7: feat: add notification trigger logic
+# TODO 8: feat: add webhook dispatch logic
 
 load_dotenv()
 API_KEY = os.environ.get("API_KEY")
 URL = "https://creativecommons.tankerkoenig.de/json"
+STATION_IDS = os.environ.get("STATION_IDS", "").split(",")
 
 
 engine = create_engine("sqlite:///tankstellen-alert.db")
@@ -85,3 +88,28 @@ def get_prices(station_ids: list):
     r = requests.get(URL+"/prices.php", params={"ids": ",".join(station_ids), "apikey": API_KEY})
     r.raise_for_status()
     return r.json()
+
+
+def upsert_station(station_id):
+    if not station_id:
+        return
+    data = get_station_info(station_id).get("station", {})
+    if not data:
+        return
+    station_obj = Station(
+        id=station_id,
+        name=data.get("name"),
+        brand=data.get("brand"),
+        street=data.get("street"),
+        house_number=data.get("houseNumber"),
+        post_code=str(data.get("postCode")).zfill(5),
+        city=data.get("place"),
+        lat=data.get("lat"),
+        lng=data.get("lng"),
+        last_updated=datetime.today(),
+    )
+    with Session(engine) as session:
+        session.merge(station_obj)
+        session.commit()
+
+
