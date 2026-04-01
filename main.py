@@ -1,3 +1,6 @@
+import os
+from dotenv import load_dotenv
+import requests
 from datetime import datetime
 from typing import List
 from sqlalchemy import (
@@ -13,14 +16,15 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from decimal import Decimal
 
-
-# DONE 1: feat: define database models and table schema
-# TODO 2: feat: define API request functions
 # TODO 3: feat: add setup_stations script for initial station discovery
 # TODO 4: feat: implement station upsert logic
 # TODO 5: feat: implement price history upsert logic
 # TODO 6: feat: add notification trigger logic
 # TODO 7: feat: add webhook dispatch logic
+
+load_dotenv()
+API_KEY = os.environ.get("API_KEY")
+URL = "https://creativecommons.tankerkoenig.de/json"
 
 
 engine = create_engine("sqlite:///tankstellen-alert.db")
@@ -69,3 +73,15 @@ class PriceHistory(Base):
 
 
 Base.metadata.create_all(engine)
+
+
+def get_station_info(station_id):
+    r = requests.get(URL+"/detail.php", params={"id": station_id, "apikey": API_KEY})
+    r.raise_for_status()
+    return r.json()
+
+
+def get_prices(station_ids: list):
+    r = requests.get(URL+"/prices.php", params={"ids": ",".join(station_ids), "apikey": API_KEY})
+    r.raise_for_status()
+    return r.json()
