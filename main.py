@@ -16,7 +16,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from decimal import Decimal
 
-# TODO 3: feat: add setup_stations script for initial station discovery
 # TODO 4: feat: implement station upsert logic
 # TODO 5: feat: implement price history upsert logic
 # TODO 6: feat: add notification trigger logic
