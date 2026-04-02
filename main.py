@@ -1,6 +1,4 @@
 import os
-import time
-
 from dotenv import load_dotenv
 import requests
 from datetime import datetime, timedelta
