@@ -18,12 +18,10 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, Session
 from decimal import Decimal
 
-# TODO 7: feat: add notification trigger logic
-# TODO 8: feat: add webhook dispatch logic
-
 load_dotenv()
 API_KEY = os.environ.get("API_KEY")
 URL = "https://creativecommons.tankerkoenig.de/json"
+DISCORD_URL = os.environ.get("DISCORD_WEBHOOK")
 STATION_IDS = os.environ.get("STATION_IDS", "").split(",")
 GAS_TYPE = "e10"
 THRESHOLD = 2.0
@@ -173,3 +171,24 @@ def price_check(threshold=THRESHOLD, gas_type=GAS_TYPE, station_ids=None):
                     }
                 )
     return alert_stations
+
+
+def generate_alert_message(alert_stations: list):
+    message = (f"@everyone\n"
+               f"Preis-Alarm:\n"
+               f"Das Skript wurde für folgende Tankstellen ausgelöst:\n")
+    for station in alert_stations:
+        message = message + (f" - {station["gas_type"]} {station["price"]}€/l:"
+                             f"{station["name"]} - {station["brand"]} - {station["street"]}\n")
+    return message
+
+
+def main():
+    alert_stations = price_check()
+    if alert_stations:
+        message = generate_alert_message(alert_stations)
+        requests.post(DISCORD_URL, json={"content": message})
+
+
+if __name__ == "__main__":
+    main()
