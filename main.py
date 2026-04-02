@@ -140,7 +140,7 @@ def add_price_history(station_ids: list):
 def check_and_update_station(station_id):
     with Session(engine) as session:
         station = session.get(Station, station_id)
-        if datetime.today() - station.last_updated > timedelta(days=7):
+        if not station or not station.last_updated or datetime.today() - station.last_updated > timedelta(days=7):
             upsert_station(station_id)
 
 
