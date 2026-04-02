@@ -4,7 +4,7 @@ import time
 from dotenv import load_dotenv
 import requests
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Optional
 from sqlalchemy import (
     ForeignKey,
     String,
@@ -58,9 +58,9 @@ class Station(Base):
 class PriceHistory(Base):
     __tablename__ = "price_history"
     id: Mapped[int] = mapped_column(primary_key=True)
-    e5: Mapped[Decimal] = mapped_column(Numeric(precision=5, scale=3))
-    e10: Mapped[Decimal] = mapped_column(Numeric(precision=5, scale=3))
-    diesel: Mapped[Decimal] = mapped_column(Numeric(precision=5, scale=3))
+    e5: Mapped[Optional[Decimal]] = mapped_column(Numeric(precision=5, scale=3))
+    e10: Mapped[Optional[Decimal]] = mapped_column(Numeric(precision=5, scale=3))
+    diesel: Mapped[Optional[Decimal]] = mapped_column(Numeric(precision=5, scale=3))
     is_open: Mapped[bool] = mapped_column(Boolean)
     timestamp: Mapped[datetime] = mapped_column(DateTime)
     station_id: Mapped[str] = mapped_column(String(36), ForeignKey("station.id"))
