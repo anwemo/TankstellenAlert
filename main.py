@@ -121,7 +121,7 @@ def add_price_history(station_ids: list):
         return
     new_prices = []
     all_stations_prices = get_prices(station_ids).get("prices", {})
-    with Session(engine) as session:
+    with Session(engine, expire_on_commit=False) as session:
         for station_id, prices in all_stations_prices.items():
             new_price = PriceHistory(
                 e5=prices.get("e5"),
