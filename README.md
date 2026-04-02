@@ -49,7 +49,7 @@ LNG=your-longitude
 
 ### 4. Find your station IDs
 
-Run the setup script to find gas stations near your location:
+Run the setup script to find gas stations near your location using the LAT and LNG variables you specified in the .env file:
 ```bash
 python setup_stations.py
 ```
