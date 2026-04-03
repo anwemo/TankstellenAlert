@@ -32,6 +32,13 @@ cd TankstellenAlert
 ```
 
 ### 2. Install dependencies
+(Recommended) Create a virtual environment:
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+.venv\Scripts\activate     # Windows
+```
+Then install the dependencies:
 ```bash
 pip install -r requirements.txt
 ```
