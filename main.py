@@ -146,7 +146,7 @@ def price_check(threshold=THRESHOLD, gas_type=GAS_TYPE, station_ids=None):
     if station_ids is None:
         station_ids = STATION_IDS
     if not station_ids:
-        return "Error! No station ids defined."
+        raise ValueError("STATION_IDS is empty. Please check your .env file")
     for station_id in station_ids:
         check_and_update_station(station_id)
     new_prices = add_price_history(station_ids)
