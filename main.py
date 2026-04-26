@@ -78,7 +78,7 @@ Base.metadata.create_all(engine)
 
 
 def get_station_info(station_id):
-    r = requests.get(URL + "/detail.php", params={"id": station_id, "apikey": API_KEY})
+    r = requests.get(URL + "/detail.php", params={"id": station_id, "apikey": API_KEY}, timeout=10)
     r.raise_for_status()
     return r.json()
 
@@ -185,7 +185,7 @@ def main():
     alert_stations = price_check()
     if alert_stations:
         message = generate_alert_message(alert_stations)
-        requests.post(DISCORD_URL, json={"content": message})
+        requests.post(DISCORD_URL, json={"content": message}, timeout=10)
 
 
 if __name__ == "__main__":
