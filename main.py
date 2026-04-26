@@ -20,7 +20,7 @@ load_dotenv()
 API_KEY = os.environ.get("API_KEY")
 URL = "https://creativecommons.tankerkoenig.de/json"
 DISCORD_URL = os.environ.get("DISCORD_WEBHOOK")
-STATION_IDS = STATION_IDS = [s for s in os.environ.get("STATION_IDS", "").split(",") if s]
+STATION_IDS = [s for s in os.environ.get("STATION_IDS", "").split(",") if s]
 GAS_TYPE = "e10"
 THRESHOLD = 2.0
 
