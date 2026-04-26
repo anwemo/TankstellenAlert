@@ -78,14 +78,18 @@ Base.metadata.create_all(engine)
 
 
 def get_station_info(station_id):
-    r = requests.get(URL + "/detail.php", params={"id": station_id, "apikey": API_KEY}, timeout=10)
+    r = requests.get(
+        URL + "/detail.php", params={"id": station_id, "apikey": API_KEY}, timeout=10
+    )
     r.raise_for_status()
     return r.json()
 
 
 def get_prices(station_ids: list):
     r = requests.get(
-        URL + "/prices.php", params={"ids": ",".join(station_ids), "apikey": API_KEY}
+        URL + "/prices.php",
+        params={"ids": ",".join(station_ids), "apikey": API_KEY},
+        timeout=10,
     )
     r.raise_for_status()
     return r.json()
@@ -138,7 +142,11 @@ def add_price_history(station_ids: list):
 def check_and_update_station(station_id):
     with Session(engine) as session:
         station = session.get(Station, station_id)
-        if not station or not station.last_updated or datetime.today() - station.last_updated > timedelta(days=7):
+        if (
+            not station
+            or not station.last_updated
+            or datetime.today() - station.last_updated > timedelta(days=7)
+        ):
             upsert_station(station_id)
 
 
@@ -172,12 +180,16 @@ def price_check(threshold=THRESHOLD, gas_type=GAS_TYPE, station_ids=None):
 
 
 def generate_alert_message(alert_stations: list):
-    message = (f"@everyone\n"
-               f"Preis-Alarm:\n"
-               f"Das Skript wurde für folgende Tankstellen ausgelöst:\n")
+    message = (
+        f"@everyone\n"
+        f"Preis-Alarm:\n"
+        f"Das Skript wurde für folgende Tankstellen ausgelöst:\n"
+    )
     for station in alert_stations:
-        message = message + (f" - {station["gas_type"]} {station["price"]}€/l:"
-                             f"{station["name"]} - {station["brand"]} - {station["street"]}\n")
+        message = message + (
+            f" - {station["gas_type"]} {station["price"]}€/l:"
+            f"{station["name"]} - {station["brand"]} - {station["street"]}\n"
+        )
     return message
 
 
