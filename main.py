@@ -39,7 +39,7 @@ class Station(Base):
     brand: Mapped[str] = mapped_column(String(50))
     street: Mapped[str] = mapped_column(String(100))
     house_number: Mapped[str] = mapped_column(String(10))
-    post_code: Mapped[int] = mapped_column(Integer)
+    post_code: Mapped[str] = mapped_column(String(5))
     city: Mapped[str] = mapped_column(String(100))
     lat: Mapped[float] = mapped_column(Float)
     lng: Mapped[float] = mapped_column(Float)
