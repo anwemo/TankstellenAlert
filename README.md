@@ -49,9 +49,11 @@ Create a `.env` file in the root directory:
 ```
 API_KEY=your-tankerkoenig-api-key
 DISCORD_WEBHOOK=your-discord-webhook-url
-STATION_IDS= # keep empty for now
+STATION_IDS=       # keep empty for now
 LAT=your-latitude
 LNG=your-longitude
+GAS_TYPE=e10       # Options: e5, e10, diesel
+THRESHOLD=1.80     # Alert when price drops below this value in €
 ```
 
 ### 4. Find your station IDs
@@ -63,15 +65,7 @@ python setup_stations.py
 
 Copy the IDs of the stations you want to monitor and add them to `STATION_IDS` in your `.env` file. Should look like "STATION_IDS=id1,id2,id3"
 
-### 5. Configure threshold and fuel type
-
-In `main.py`, adjust these constants to your preference:
-```python
-GAS_TYPE = "e10"   # Options: "e5", "e10", "diesel"
-THRESHOLD = 1.80   # Alert when price drops below this float value in €
-```
-
-### 6. Run the script
+### 5. Run the script
 ```bash
 python main.py
 ```
