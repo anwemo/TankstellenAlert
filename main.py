@@ -18,6 +18,7 @@ from decimal import Decimal
 
 load_dotenv()
 API_KEY = os.environ.get("API_KEY")
+DB_PATH=os.environ.get("DB_PATH")
 URL = "https://creativecommons.tankerkoenig.de/json"
 DISCORD_URL = os.environ.get("DISCORD_WEBHOOK")
 STATION_IDS = [s for s in os.environ.get("STATION_IDS", "").split(",") if s]
@@ -25,7 +26,7 @@ GAS_TYPE = os.environ.get("GAS_TYPE", "e10")
 THRESHOLD = float(os.environ.get("THRESHOLD", "1.80"))
 
 
-engine = create_engine("sqlite:///tankstellen-alert.db")
+engine = create_engine(f"sqlite:///{DB_PATH}")
 
 
 class Base(DeclarativeBase):
