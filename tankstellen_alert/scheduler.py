@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 from tankstellen_alert.alert import price_check
-from tankstellen_alert.notifier import send_alert
+from tankstellen_alert.notifier import send_alert, send_error_alert
 
 log = logging.getLogger(__name__)
 
@@ -13,11 +13,9 @@ def job():
     log.info("Starting TankstellenAlert")
     try:
         alert_stations = price_check()
-    except ValueError as e:
-        log.error("Configuration error: %s", e)
-        return
     except Exception as e:
         log.error("Unexpected error during price check: %s", e, exc_info=True)
+        send_error_alert(e)
         return
 
     if not alert_stations:
@@ -30,7 +28,6 @@ def job():
         log.error("Failed to send alert: %s", e, exc_info=True)
 
     log.info("TankstellenAlert finished")
-
 
 def _minutes_until_next_run() -> int:
     now = datetime.now()

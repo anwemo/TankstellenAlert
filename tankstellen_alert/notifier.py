@@ -25,13 +25,23 @@ def _generate_alert_message(alert_stations: list[AlertStation], debug):
     return message
 
 
+def _send_to_discord(message: str):
+    r = requests.post(DISCORD_URL, json={"content": message}, timeout=10)
+    r.raise_for_status()
+
+
 def send_alert(alert_stations):
     log.debug("Preparing to send message for %s stations", len(alert_stations))
     message = _generate_alert_message(alert_stations, DEBUG)
+    _send_to_discord(message)
+    log.info("Alert sent successfully")
+
+
+def send_error_alert(error: Exception):
+    log.debug("Sending error alert to Discord")
+    message = f"⚠️ TankstellenAlert Fehler:\n```{type(error).__name__}: {error}```"
     try:
-        r = requests.post(DISCORD_URL, json={"content": message}, timeout=10)
-        r.raise_for_status()
-        log.info("Alert sent successfully")
+        _send_to_discord(message)
+        log.info("Error alert sent successfully")
     except requests.HTTPError as e:
-        log.error("Discord webhook failed: %s", e)
-        raise
+        log.error("Failed to send error alert to Discord: %s", e)
