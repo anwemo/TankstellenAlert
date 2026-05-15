@@ -4,6 +4,8 @@
 #
 #    pip-compile requirements.in
 #
+apscheduler==3.11.2
+    # via -r requirements.in
 certifi==2026.4.22
     # via requests
 charset-normalizer==3.4.7
@@ -22,6 +24,10 @@ sqlalchemy==2.0.48
     # via -r requirements.in
 typing-extensions==4.15.0
     # via sqlalchemy
+tzdata==2026.2
+    # via tzlocal
+tzlocal==5.3.1
+    # via apscheduler
 urllib3==2.6.3
     # via requests
 wcwidth==0.6.0

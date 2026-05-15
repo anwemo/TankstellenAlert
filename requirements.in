@@ -2,3 +2,4 @@ requests
 sqlalchemy
 python-dotenv
 prettytable
+APScheduler
