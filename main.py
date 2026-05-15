@@ -32,6 +32,7 @@ class Base(DeclarativeBase):
     pass
 
 
+# noinspection PyTypeChecker
 class Station(Base):
     __tablename__ = "station"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
@@ -41,8 +42,8 @@ class Station(Base):
     house_number: Mapped[str] = mapped_column(String(10))
     post_code: Mapped[str] = mapped_column(String(5))
     city: Mapped[str] = mapped_column(String(100))
-    lat: Mapped[float] = mapped_column(Float)
-    lng: Mapped[float] = mapped_column(Float)
+    lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     price_history: Mapped[List["PriceHistory"]] = relationship(back_populates="station")
     last_updated: Mapped[datetime] = mapped_column(DateTime)
 
@@ -53,6 +54,7 @@ class Station(Base):
         return f"Station(id={self.id!r}, name={self.name!r}, brand={self.brand!r}, street={self.street!r})"
 
 
+# noinspection PyTypeChecker
 class PriceHistory(Base):
     __tablename__ = "price_history"
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -103,14 +105,14 @@ def upsert_station(station_id):
         return
     station_obj = Station(
         id=station_id,
-        name=data.get("name"),
-        brand=data.get("brand"),
-        street=data.get("street"),
-        house_number=data.get("houseNumber"),
-        post_code=str(data.get("postCode")).zfill(5),
-        city=data.get("place"),
-        lat=data.get("lat"),
-        lng=data.get("lng"),
+        name=data.get("name") or "",
+        brand=data.get("brand") or "",
+        street=data.get("street") or "",
+        house_number=data.get("houseNumber") or "",
+        post_code=str(data.get("postCode") or "").zfill(5),
+        city=data.get("place") or "",
+        lat=data.get("lat") or "",
+        lng=data.get("lng") or "",
         last_updated=datetime.today(),
     )
     with Session(engine) as session:
