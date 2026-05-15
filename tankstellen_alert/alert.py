@@ -49,8 +49,8 @@ def check_alerts(new_prices, gas_type, threshold):
             log.debug("Station %s above threshold, skipping", new_price.station_id)
             continue
         last_price = get_last_price(new_price.station_id, gas_type)
-        if last_price is not None and last_price < threshold:
-            log.debug("Station %s already below threshold, skipping", new_price.station_id)
+        if last_price is not None and last_price == price:
+            log.debug("Station %s price unchanged, skipping", new_price.station_id)
             continue
         alert = build_alert_station(new_price, gas_type, threshold)
         if alert:
