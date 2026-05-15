@@ -1,9 +1,13 @@
 import requests
+import logging
 from tankstellen_alert.config import DISCORD_URL, DEBUG
 from tankstellen_alert.models import AlertStation
 
+log = logging.getLogger(__name__)
+
 
 def _generate_alert_message(alert_stations: list[AlertStation], debug):
+    log.debug("Generating message for {0} station(s)", len(alert_stations))
     message = (
         f"@everyone\n"
         f"Preis-Alarm:\n"
@@ -22,7 +26,15 @@ def _generate_alert_message(alert_stations: list[AlertStation], debug):
 
 
 def send_alert(alert_stations):
-    if not alert_stations:
+    if not DISCORD_URL:
+        log.error("DISCORD_WEBHOOK is not set in .env")
         return
+    log.debug("Preparing to send message for {0} stations", len(alert_stations))
     message = _generate_alert_message(alert_stations, DEBUG)
-    requests.post(DISCORD_URL, json={"content": message}, timeout=10)
+    try:
+        r = requests.post(DISCORD_URL, json={"content": message}, timeout=10)
+        r.raise_for_status()
+        log.info("Alert sent successfully")
+    except requests.HTTPError as e:
+        log.error("Discord webhook failed: {0}", e)
+        raise
