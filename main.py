@@ -10,10 +10,10 @@ def main():
     try:
         alert_stations = price_check()
     except ValueError as e:
-        log.error("Configuration error: {0}", e)
+        log.error("Configuration error: %s", e)
         return
     except Exception as e:
-        log.error("Unexpected error during price check: {0}", e, exc_info=True)
+        log.error("Unexpected error during price check: %s", e, exc_info=True)
         return
 
     if not alert_stations:
@@ -23,7 +23,7 @@ def main():
     try:
         send_alert(alert_stations)
     except Exception as e:
-        log.error("Failed to send alert: {0}", e, exc_info=True)
+        log.error("Failed to send alert: %s", e, exc_info=True)
 
     log.info("TankstellenAlert finished")
 

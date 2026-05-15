@@ -54,9 +54,9 @@ GAS_TYPE = GAS_TYPE_RAW if GAS_TYPE_RAW else _GAS_TYPE_DEFAULT
 THRESHOLD = float(THRESHOLD_RAW) if THRESHOLD_RAW else _THRESHOLD_DEFAULT
 
 if not GAS_TYPE_RAW:
-    log.warning("GAS_TYPE not set, using default: {0}", _GAS_TYPE_DEFAULT)
+    log.warning("GAS_TYPE not set, using default: %s", _GAS_TYPE_DEFAULT)
 if not THRESHOLD_RAW:
-    log.warning("THRESHOLD not set, using default: {0}", _THRESHOLD_DEFAULT)
+    log.warning("THRESHOLD not set, using default: %s", _THRESHOLD_DEFAULT)
 
 _required = {
     "API_KEY": API_KEY,
@@ -65,7 +65,7 @@ _required = {
 }
 for name, value in _required.items():
     if not value:
-        log.error("Missing required environment variable: {0}", name)
+        log.error("Missing required environment variable: %s", name)
         raise ValueError(f"Missing required environment variable: {name}")
 
-log.info("Config loaded. DB: {0}, GAS_TYPE: {1}, THRESHOLD: {2}, DEBUG: {3}", DB_PATH, GAS_TYPE, THRESHOLD, DEBUG)
+log.info("Config loaded. DB: %s, GAS_TYPE: %s, THRESHOLD: %s, DEBUG: %s", DB_PATH, GAS_TYPE, THRESHOLD, DEBUG)
