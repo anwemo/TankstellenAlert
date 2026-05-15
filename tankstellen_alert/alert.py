@@ -27,9 +27,6 @@ def update_stations(station_ids):
 def price_check(threshold=THRESHOLD, gas_type=GAS_TYPE, station_ids=None):
     if station_ids is None:
         station_ids = STATION_IDS
-    if not station_ids:
-        log.error("STATION_IDS is empty")
-        raise ValueError("STATION_IDS is empty. Please check your .env file")
     log.info("Starting price check for {0} station(s)", len(station_ids))
     update_stations(station_ids)
     prices = get_prices(station_ids).get("prices", {})

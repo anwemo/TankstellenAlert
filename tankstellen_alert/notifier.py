@@ -26,9 +26,6 @@ def _generate_alert_message(alert_stations: list[AlertStation], debug):
 
 
 def send_alert(alert_stations):
-    if not DISCORD_URL:
-        log.error("DISCORD_WEBHOOK is not set in .env")
-        return
     log.debug("Preparing to send message for {0} stations", len(alert_stations))
     message = _generate_alert_message(alert_stations, DEBUG)
     try:
