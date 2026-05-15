@@ -1,0 +1,10 @@
+services:
+  tankstellen-alert:
+    build: .
+    container_name: tankstellen-alert
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    volumes:
+      - /volume1/docker/tankstellen-alert/data:/data
+    restart: "no"
