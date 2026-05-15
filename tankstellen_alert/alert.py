@@ -1,13 +1,16 @@
 import logging
+from decimal import Decimal
+
+from tankstellen_alert.api import get_station_info, get_prices
+from tankstellen_alert.config import STATION_IDS, THRESHOLD, GAS_TYPE
 from tankstellen_alert.db import (
     upsert_station,
     add_price_history,
     get_last_price,
     station_update_needed,
-    build_alert_station,
+    get_station,
 )
-from tankstellen_alert.api import get_station_info, get_prices
-from tankstellen_alert.config import STATION_IDS, THRESHOLD, GAS_TYPE
+from tankstellen_alert.models import AlertStation
 
 log = logging.getLogger(__name__)
 
@@ -35,6 +38,24 @@ def price_check(threshold=THRESHOLD, gas_type=GAS_TYPE, station_ids=None):
         log.warning("No prices returned")
         return None
     return check_alerts(new_prices, gas_type, threshold)
+
+
+# noinspection PyTypeChecker
+def build_alert_station(new_price, gas_type: str, threshold: Decimal):
+    log.debug("Building AlertStation for station %s", new_price.station_id)
+    station = get_station(new_price.station_id)
+    if not station:
+        log.warning("Station %s not found in db, skipping alert", new_price.station_id)
+        return None
+    return AlertStation(
+        gas_type=gas_type,
+        station_id=station.id,
+        price=getattr(new_price, gas_type),
+        threshold=threshold,
+        name=station.name,
+        brand=station.brand,
+        street=f"{station.street} {station.house_number}",
+    )
 
 
 def check_alerts(new_prices, gas_type, threshold):

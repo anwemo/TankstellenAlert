@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 from decimal import Decimal
 from tankstellen_alert.config import engine
-from tankstellen_alert.models import Base, Station, PriceHistory, AlertStation
+from tankstellen_alert.models import Base, Station, PriceHistory
 import logging
 
 log = logging.getLogger(__name__)
@@ -90,19 +90,7 @@ def station_update_needed(station_id):
 
 
 # noinspection PyTypeChecker
-def build_alert_station(new_price: PriceHistory, gas_type: str, threshold: Decimal):
-    log.debug("Building AlertStation for station %s", new_price.station_id)
+def get_station(station_id: str) -> Optional[Station]:
+    log.debug("Fetching station %s from db", station_id)
     with Session(engine) as session:
-        station = session.get(Station, new_price.station_id)
-        if not station:
-            log.warning("Station %s not found in db, skipping alert", new_price.station_id)
-            return None
-        return AlertStation(
-            gas_type=gas_type,
-            station_id=station.id,
-            price=getattr(new_price, gas_type),
-            threshold=threshold,
-            name=station.name,
-            brand=station.brand,
-            street=f"{station.street} {station.house_number}",
-        )
+        return session.get(Station, station_id)
