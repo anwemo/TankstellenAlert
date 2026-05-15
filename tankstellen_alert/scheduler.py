@@ -29,6 +29,7 @@ def job():
 
     log.info("TankstellenAlert finished")
 
+
 def _minutes_until_next_run() -> int:
     now = datetime.now()
     current_minute = now.minute
@@ -45,6 +46,8 @@ def start():
         job()
 
     scheduler = BlockingScheduler()
-    scheduler.add_job(job, 'cron', minute=','.join(map(str, SCHEDULED_MINUTES)))
-    log.info("Scheduler started, running at :%s", ', :'.join(map(str, SCHEDULED_MINUTES)))
+    scheduler.add_job(job, "cron", minute=",".join(map(str, SCHEDULED_MINUTES)))
+    log.info(
+        "Scheduler started, running at :%s", ", :".join(map(str, SCHEDULED_MINUTES))
+    )
     scheduler.start()

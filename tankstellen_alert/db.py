@@ -13,7 +13,9 @@ Base.metadata.create_all(engine)
 
 def upsert_station(station_id, data):
     log.debug("Upserting station %s", station_id)
-    station_label = f"{data.get('name')}, {data.get('street')} {data.get('houseNumber')}"
+    station_label = (
+        f"{data.get('name')}, {data.get('street')} {data.get('houseNumber')}"
+    )
     with Session(engine) as session:
         station = session.get(Station, station_id)
         if not station:

@@ -26,12 +26,15 @@ stations = r.json().get("stations", [])
 table = PrettyTable()
 table.field_names = ["ID", "Name", "Brand", "Address", "Postcode", "City"]
 for station in stations:
-    table.add_row([station.get("id"),
-                   station.get("name"),
-                   station.get("brand"),
-                   f"{station.get('street')} {station.get('houseNumber')}",
-                   station.get("postCode"),
-                   station.get("place")]
-                  )
+    table.add_row(
+        [
+            station.get("id"),
+            station.get("name"),
+            station.get("brand"),
+            f"{station.get('street')} {station.get('houseNumber')}",
+            station.get("postCode"),
+            station.get("place"),
+        ]
+    )
 
 print(table)

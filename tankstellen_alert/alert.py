@@ -64,7 +64,9 @@ def check_alerts(new_prices, gas_type, threshold):
     for new_price in new_prices:
         price = getattr(new_price, gas_type)
         if not price:
-            log.debug("Station %s has no price (closed?), skipping", new_price.station_id)
+            log.debug(
+                "Station %s has no price (closed?), skipping", new_price.station_id
+            )
             continue
         else:
             price = Decimal(str(price))

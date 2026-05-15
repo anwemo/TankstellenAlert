@@ -68,4 +68,10 @@ for name, value in _required.items():
         log.error("Missing required environment variable: %s", name)
         raise ValueError(f"Missing required environment variable: {name}")
 
-log.info("Config loaded. DB: %s, GAS_TYPE: %s, THRESHOLD: %s, DEBUG: %s", DB_PATH, GAS_TYPE, THRESHOLD, DEBUG)
+log.info(
+    "Config loaded. DB: %s, GAS_TYPE: %s, THRESHOLD: %s, DEBUG: %s",
+    DB_PATH,
+    GAS_TYPE,
+    THRESHOLD,
+    DEBUG,
+)
