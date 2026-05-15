@@ -14,12 +14,12 @@ class Base(DeclarativeBase):
 class Station(Base):
     __tablename__ = "station"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    name: Mapped[str] = mapped_column(String(100))
-    brand: Mapped[str] = mapped_column(String(50))
-    street: Mapped[str] = mapped_column(String(100))
-    house_number: Mapped[str] = mapped_column(String(10))
-    post_code: Mapped[str] = mapped_column(String(5))
-    city: Mapped[str] = mapped_column(String(100))
+    name: Mapped[Optional[str]] = mapped_column(String(100))
+    brand: Mapped[Optional[str]] = mapped_column(String(50))
+    street: Mapped[Optional[str]] = mapped_column(String(100))
+    house_number: Mapped[Optional[str]] = mapped_column(String(10))
+    post_code: Mapped[Optional[str]] = mapped_column(String(5))
+    city: Mapped[Optional[str]] = mapped_column(String(100))
     lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     price_history: Mapped[List["PriceHistory"]] = relationship(back_populates="station")

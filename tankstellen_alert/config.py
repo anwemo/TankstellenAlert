@@ -5,7 +5,9 @@ from sqlalchemy import create_engine
 
 load_dotenv()
 API_KEY = os.environ.get("API_KEY")
-DB_PATH = os.environ.get("DB_PATH", str(Path(__file__).parent.parent / "tankstellen-alert.db"))
+DB_PATH = os.environ.get(
+    "DB_PATH", str(Path(__file__).parent.parent / "tankstellen-alert.db")
+)
 URL = "https://creativecommons.tankerkoenig.de/json"
 DISCORD_URL = os.environ.get("DISCORD_WEBHOOK")
 STATION_IDS = [s for s in os.environ.get("STATION_IDS", "").split(",") if s]

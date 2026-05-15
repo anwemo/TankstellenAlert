@@ -9,24 +9,26 @@ Base.metadata.create_all(engine)
 
 
 def upsert_station(station_id, data):
-    if not station_id:
+    if not station_id or not data:
         return
-    if not data:
-        return
-    station_obj = Station(
-        id=station_id,
-        name=data.get("name") or "",
-        brand=data.get("brand") or "",
-        street=data.get("street") or "",
-        house_number=data.get("houseNumber") or "",
-        post_code=str(data.get("postCode") or "").zfill(5),
-        city=data.get("place") or "",
-        lat=data.get("lat"),
-        lng=data.get("lng"),
-        last_updated=datetime.now(),
-    )
     with Session(engine) as session:
-        session.merge(station_obj)
+        station = session.get(Station, station_id)
+        if not station:
+            station = Station(id=station_id)
+            session.add(station)
+        station.name = data.get("name") or station.name
+        station.brand = data.get("brand") or station.brand
+        station.street = data.get("street") or station.street
+        station.house_number = data.get("houseNumber") or station.house_number
+        station.post_code = (
+            str(data.get("postCode")).zfill(5)
+            if data.get("postCode")
+            else station.post_code
+        )
+        station.city = data.get("place") or station.city
+        station.lat = data.get("lat") or station.lat
+        station.lng = data.get("lng") or station.lng
+        station.last_updated = datetime.now()
         session.commit()
 
 
