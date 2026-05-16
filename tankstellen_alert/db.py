@@ -99,3 +99,15 @@ def get_station(station_id: str) -> Optional[Station]:
         if station:
             session.expunge(station)
         return station
+
+
+def update_last_alert_info(station_id, price):
+    log.debug("Updating last_alert_time and last_alert_price for station %s: %s€/l", station_id, price)
+    with Session(engine) as session:
+        station = session.get(Station, station_id)
+        if not station:
+            log.warning("Station %s not found in db, skipping last_alert update", station_id)
+            return
+        station.last_alert_price = price
+        station.last_alert_time = datetime.now()
+        session.commit()
