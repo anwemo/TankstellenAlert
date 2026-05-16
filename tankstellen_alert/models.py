@@ -25,7 +25,9 @@ class Station(Base):
     price_history: Mapped[List["PriceHistory"]] = relationship(back_populates="station")
     last_updated: Mapped[datetime] = mapped_column(DateTime)
     last_alert_time: Mapped[Optional[datetime]] = mapped_column(DateTime)
-    last_alert_price: Mapped[Optional[Decimal]] = mapped_column(Numeric(precision=5, scale=3))
+    last_alert_price: Mapped[Optional[Decimal]] = mapped_column(
+        Numeric(precision=5, scale=3)
+    )
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

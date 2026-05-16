@@ -8,7 +8,8 @@ from tankstellen_alert.api import get_prices
 from tankstellen_alert.config import STATION_IDS, THRESHOLD, GAS_TYPE
 from tankstellen_alert.db import (
     add_price_history,
-    get_station, update_last_alert_info,
+    get_station,
+    update_last_alert_info,
 )
 from tankstellen_alert.models import AlertStation, Station
 
@@ -36,7 +37,9 @@ def price_check(threshold=THRESHOLD, gas_type=GAS_TYPE, station_ids=None):
 
 
 # noinspection PyTypeChecker
-def _build_alert_station(new_price, gas_type: str, threshold: Decimal, station: Station) -> AlertStation:
+def _build_alert_station(
+    new_price, gas_type: str, threshold: Decimal, station: Station
+) -> AlertStation:
     log.debug("Building AlertStation for station %s", station.id)
     return AlertStation(
         gas_type=gas_type,
@@ -51,13 +54,18 @@ def _build_alert_station(new_price, gas_type: str, threshold: Decimal, station: 
 
 def _should_alert(price: Decimal, station: Station, threshold: Decimal) -> bool:
     if price >= threshold:
-        log.info("Station %s in %s: %s€/l, skipping", station.brand, station.street, price)
+        log.info(
+            "Station %s in %s: %s€/l, skipping", station.brand, station.street, price
+        )
         return False
     if station.last_alert_price is None or station.last_alert_time is None:
         return True
     if station.last_alert_price - price >= Decimal("0.02"):
         return True
-    if price != station.last_alert_price and datetime.now() - station.last_alert_time >= timedelta(hours=2):
+    if (
+        price != station.last_alert_price
+        and datetime.now() - station.last_alert_time >= timedelta(hours=2)
+    ):
         return True
     return False
 
@@ -65,9 +73,7 @@ def _should_alert(price: Decimal, station: Station, threshold: Decimal) -> bool:
 def _process_station(new_price, gas_type, threshold) -> AlertStation | None:
     price = getattr(new_price, gas_type)
     if not price:
-        log.debug(
-            "Station %s has no price (closed?), skipping", new_price.station_id
-        )
+        log.debug("Station %s has no price (closed?), skipping", new_price.station_id)
         return None
     price = Decimal(str(price))
     station = get_station(new_price.station_id)
@@ -75,7 +81,10 @@ def _process_station(new_price, gas_type, threshold) -> AlertStation | None:
         log.warning("Station %s not found in db, skipping", new_price.station_id)
         return None
     if not _should_alert(price, station, threshold):
-        log.debug("Station %s cooldown active or above threshold, skipping", new_price.station_id)
+        log.debug(
+            "Station %s cooldown active or above threshold, skipping",
+            new_price.station_id,
+        )
         return None
     update_last_alert_info(station.id, price)
     log.info("Alert triggered for %s: %s %s€/l", station.name, gas_type, price)
