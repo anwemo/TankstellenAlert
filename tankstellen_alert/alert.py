@@ -2,29 +2,15 @@ import logging
 from decimal import Decimal
 from datetime import datetime, timedelta
 
-from tankstellen_alert.api import get_station_info, get_prices
+from tankstellen_alert.api import get_prices
 from tankstellen_alert.config import STATION_IDS, THRESHOLD, GAS_TYPE
 from tankstellen_alert.db import (
-    upsert_station,
     add_price_history,
-    station_update_needed,
     get_station, update_last_alert_info,
 )
 from tankstellen_alert.models import AlertStation, Station
 
 log = logging.getLogger(__name__)
-
-
-def update_stations(station_ids):
-    log.info("Checking %s station(s) for updates", len(station_ids))
-    for sid in station_ids:
-        if station_update_needed(sid):
-            data = get_station_info(sid).get("station", {})
-            if not data:
-                log.warning("No data returned for station %s, skipping", sid)
-                continue
-            upsert_station(sid, data)
-    log.info("Station update check complete")
 
 
 def price_check(threshold=THRESHOLD, gas_type=GAS_TYPE, station_ids=None):

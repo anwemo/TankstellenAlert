@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 from tankstellen_alert.alert import price_check
+from tankstellen_alert.maintenance import station_maintenance
 from tankstellen_alert.notifier import send_alert, send_error_alert
 
 log = logging.getLogger(__name__)
@@ -47,6 +48,7 @@ def start():
 
     scheduler = BlockingScheduler()
     scheduler.add_job(job, "cron", minute=",".join(map(str, SCHEDULED_MINUTES)))
+    scheduler.add_job(station_maintenance, "cron", hour="3")
     log.info(
         "Scheduler started, running at :%s", ", :".join(map(str, SCHEDULED_MINUTES))
     )
