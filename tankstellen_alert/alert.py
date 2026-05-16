@@ -2,6 +2,8 @@ import logging
 from decimal import Decimal
 from datetime import datetime, timedelta
 
+from sqlalchemy.orm.base import state_attribute_str
+
 from tankstellen_alert.api import get_prices
 from tankstellen_alert.config import STATION_IDS, THRESHOLD, GAS_TYPE
 from tankstellen_alert.db import (
@@ -49,7 +51,7 @@ def _build_alert_station(new_price, gas_type: str, threshold: Decimal, station: 
 
 def _should_alert(price: Decimal, station: Station, threshold: Decimal) -> bool:
     if price >= threshold:
-        log.debug("Station %s above threshold, skipping", station.id)
+        log.info("Station %s in %s: %s€/l, skipping", station.brand, station.street, price)
         return False
     if station.last_alert_price is None or station.last_alert_time is None:
         return True
