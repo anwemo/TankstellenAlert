@@ -95,4 +95,7 @@ def station_update_needed(station_id):
 def get_station(station_id: str) -> Optional[Station]:
     log.debug("Fetching station %s from db", station_id)
     with Session(engine) as session:
-        return session.get(Station, station_id)
+        station = session.get(Station, station_id)
+        if station:
+            session.expunge(station)
+        return station
