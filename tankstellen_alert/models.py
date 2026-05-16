@@ -23,7 +23,7 @@ class Station(Base):
     lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     price_history: Mapped[List["PriceHistory"]] = relationship(back_populates="station")
-    last_updated: Mapped[datetime] = mapped_column(DateTime)
+    last_updated: Mapped[Optional[datetime]] = mapped_column(DateTime)
     last_alert_time: Mapped[Optional[datetime]] = mapped_column(DateTime)
     last_alert_price: Mapped[Optional[Decimal]] = mapped_column(
         Numeric(precision=5, scale=3)
