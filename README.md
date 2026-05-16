@@ -1,6 +1,6 @@
 # TankstellenAlert 🚨⛽
 
-A Python package that monitors fuel prices at selected German gas stations and sends a Discord notification when prices drop below a defined threshold. Alerts are only sent when a price newly drops below the threshold — no repeated notifications for prices that are already low.
+A Python package that monitors fuel prices at selected German gas stations and sends a Discord notification when prices drop below a defined threshold.
 
 > **Note:** This project uses the [Tankerkönig API](https://creativecommons.tankerkoenig.de/), which provides real-time fuel price data for Germany only.
 
@@ -10,9 +10,12 @@ A Python package that monitors fuel prices at selected German gas stations and s
 
 - Monitors up to 10 gas stations simultaneously
 - Stores price history in a local SQLite database
-- Automatically refreshes station metadata weekly
+- Automatically refreshes station metadata daily
 - Sends Discord webhook notifications when prices drop below your threshold
-- Alerts only on new threshold crossings — no spam
+- Smart alert logic — alerts only when:
+  - Price drops by at least 2 cents, or
+  - Price has changed and at least 2 hours have passed since the last alert
+- Built-in scheduler via APScheduler — no cron needed
 - Configurable fuel type and threshold via environment variables
 - Daily log rotation with 30-day retention
 
@@ -32,14 +35,16 @@ A Python package that monitors fuel prices at selected German gas stations and s
 TankstellenAlert/
 ├── tankstellen_alert/
 │   ├── __init__.py
-│   ├── config.py       # Environment variables, logging setup, DB engine
-│   ├── models.py       # SQLAlchemy models and AlertStation dataclass
-│   ├── db.py           # Database operations
-│   ├── api.py          # Tankerkönig API calls
-│   ├── alert.py        # Price check and alert logic
-│   └── notifier.py     # Discord webhook
-├── main.py             # Entry point
-├── setup_stations.py   # Helper to find station IDs
+│   ├── config.py        # Environment variables, logging setup, DB engine
+│   ├── models.py        # SQLAlchemy models and AlertStation dataclass
+│   ├── db.py            # Database operations
+│   ├── api.py           # Tankerkönig API calls
+│   ├── alert.py         # Price check and alert logic
+│   ├── maintenance.py   # Station metadata maintenance
+│   ├── notifier.py      # Discord webhook
+│   └── scheduler.py     # APScheduler setup and job definitions
+├── main.py              # Entry point
+├── setup_stations.py    # Helper to find station IDs
 └── requirements.txt
 ```
 
@@ -79,8 +84,10 @@ Create a `.env` file in the root directory:
 API_KEY=your-tankerkoenig-api-key
 DISCORD_WEBHOOK=your-discord-webhook-url
 STATION_IDS=            # comma-separated station IDs, e.g. id1,id2,id3
-LAT=your-latitude       # used by setup_stations.py
-LNG=your-longitude      # used by setup_stations.py
+
+# Used by setup_stations.py only
+LAT=your-latitude
+LNG=your-longitude
 
 # Optional (defaults shown)
 GAS_TYPE=e10            # Options: e5, e10, diesel
@@ -106,13 +113,7 @@ Copy the IDs of the stations you want to monitor and add them to `STATION_IDS` i
 python main.py
 ```
 
-### 6. Automate with cron
-
-To run the script every 15 minutes (minimum interval per Tankerkönig ToS):
-
-```
-*/15 * * * * /path/to/.venv/bin/python /path/to/main.py
-```
+The scheduler runs automatically at :14, :29, :44, and :59 every hour. Station metadata is refreshed daily at 3:00 AM.
 
 ---
 
