@@ -62,14 +62,18 @@ def _should_alert(price: Decimal, station: Station, threshold: Decimal) -> bool:
         )
         return False
     if station.last_alert_price is None or station.last_alert_time is None:
+        log.info("%s: %s€/l. First alert, no previous data", station, price)
         return True
     if station.last_alert_price - price >= Decimal("0.02"):
+        log.info("%s: %s€/l. Price dropped by more than 2 cents", station, price)
         return True
     if (
         price != station.last_alert_price
         and datetime.now() - station.last_alert_time >= timedelta(hours=2)
     ):
+        log.info("%s: %s€/l. Price changed and cooldown expired", station, price)
         return True
+    log.info("%s: %s€/l. Cooldown active, skipping", station, price)
     return False
 
 
