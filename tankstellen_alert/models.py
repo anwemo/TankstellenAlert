@@ -33,7 +33,10 @@ class Station(Base):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return f"Station(id={self.id!r}, name={self.name!r}, brand={self.brand!r}, street={self.street!r})"
+        return f"Station(id={self.id!r}, brand={self.brand!r}, address={f'{self.street} {self.house_number}'!r})"
+
+    def __str__(self):
+        return f"{self.brand}, {self.street} {self.house_number}"
 
 
 # noinspection PyTypeChecker
