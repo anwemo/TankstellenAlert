@@ -85,6 +85,6 @@ def _process_station(new_price, gas_type, threshold, station) -> AlertStation | 
             station,
         )
         return None
-    update_last_alert_info(station.id, price)
+    update_last_alert_info(station, price)
     log.info("Alert triggered for %s: %s %s€/l", station, gas_type, price)
     return _build_alert_station(new_price, gas_type, threshold, station)
