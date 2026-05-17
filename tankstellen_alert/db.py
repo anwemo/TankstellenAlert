@@ -90,14 +90,23 @@ def station_update_needed(station_id):
         return False
 
 
+def get_station_objects(station_ids: list) -> dict[str, Station]:
+    stations = {}
+    with Session(engine) as session:
+        for station_id in station_ids:
+            station = session.get(Station, station_id)
+            if not station:
+                log.warning("Station %s not found in db, skipping", station_id)
+                continue
+            log.debug("Fetching station %r from db", station)
+            session.expunge(station)
+            stations[station_id] = station
+    return stations
+
+
 # noinspection PyTypeChecker
 def get_station(station_id: str) -> Optional[Station]:
-    log.debug("Fetching station %s from db", station_id)
-    with Session(engine) as session:
-        station = session.get(Station, station_id)
-        if station:
-            session.expunge(station)
-        return station
+    return get_station_objects([station_id]).get(station_id)
 
 
 def update_last_alert_info(station_id, price):
