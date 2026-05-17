@@ -42,6 +42,9 @@ def _minutes_until_next_run() -> int:
 
 
 def start():
+    log.info("Running initial station maintenance on startup")
+    station_maintenance()
+
     if _minutes_until_next_run() > 1:
         log.info("Running initial check on startup")
         job()
