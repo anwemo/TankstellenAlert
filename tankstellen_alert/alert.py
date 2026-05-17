@@ -19,7 +19,7 @@ def price_check(threshold=THRESHOLD, gas_type=GAS_TYPE, station_ids=None):
         station_ids = STATION_IDS
     log.info("Starting price check for %s station(s)", len(station_ids))
     prices = get_prices(station_ids).get("prices", {})
-    new_prices = add_price_history(station_ids, prices)
+    new_prices = add_price_history(prices)
     if not new_prices:
         log.warning("No prices returned")
         return None

@@ -39,7 +39,7 @@ def upsert_station(station_id, data):
             log.info("Updated station: %s", station)
 
 
-def add_price_history(station_ids: list, all_stations_prices):
+def add_price_history(all_stations_prices):
     new_prices = []
     with Session(engine, expire_on_commit=False) as session:
         for station_id, prices in all_stations_prices.items():
