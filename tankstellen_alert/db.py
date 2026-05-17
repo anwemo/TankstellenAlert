@@ -13,17 +13,12 @@ Base.metadata.create_all(engine)
 
 def upsert_station(station_id, data):
     log.debug("Upserting station %s", station_id)
-    station_label = (
-        f"{data.get('name')}, {data.get('street')} {data.get('houseNumber')}"
-    )
     with Session(engine) as session:
         station = session.get(Station, station_id)
-        if not station:
+        is_new = not station
+        if is_new:
             station = Station(id=station_id)
             session.add(station)
-            log.info("Station not found in db, adding: %s", station_label)
-        else:
-            log.info("Station found in db, updating: %s", station_label)
         station.name = data.get("name") or station.name
         station.brand = data.get("brand") or station.brand
         station.street = data.get("street") or station.street
@@ -38,6 +33,10 @@ def upsert_station(station_id, data):
         station.lng = data.get("lng") or station.lng
         station.last_updated = datetime.now()
         session.commit()
+        if is_new:
+            log.info("Added new station: %s", station)
+        else:
+            log.info("Updated station: %s", station)
 
 
 def add_price_history(station_ids: list, all_stations_prices):
@@ -52,7 +51,7 @@ def add_price_history(station_ids: list, all_stations_prices):
                 timestamp=datetime.today(),
                 station_id=station_id,
             )
-            log.debug("Added new PriceHistory: %s", new_price)
+            log.debug("Added new PriceHistory: %r", new_price)
             session.add(new_price)
             new_prices.append(new_price)
         session.commit()
